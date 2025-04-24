@@ -1,0 +1,118 @@
+/* Reset & Global Styles */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to right, #e8f5e9, #e0f7fa);
+    color: #333;
+  }
+  
+  .container {
+    max-width: 900px;
+    margin: auto;
+    padding: 40px 20px;
+    text-align: center;
+  }
+  
+  header h1 {
+    font-size: 3rem;
+    color: #2ecc71;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+  }
+  
+  header h1 .highlight {
+    color: #9b59b6;
+  }
+  
+  header p {
+    font-size: 1.2rem;
+    color: #34495e;
+    margin-top: 0;
+  }
+  
+  .upload-section, .result-section {
+    margin-top: 40px;
+  }
+  
+  input[type="file"] {
+    padding: 12px;
+    border: 2px dashed #27ae60;
+    border-radius: 8px;
+    background-color: #f0fdfa;
+    margin-top: 20px;
+    font-size: 1rem;
+  }
+  
+  button {
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1rem;
+    border-radius: 8px;
+    margin-top: 20px;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #2ecc71;
+  }
+  
+  /* Result image */
+  .result-image {
+    max-width: 100%;
+    height: auto;
+    margin-top: 20px;
+    border: 3px solid #ddd;
+    border-radius: 10px;
+  }
+  
+  /* Spinner Loader */
+  .spinner {
+    margin: 20px auto;
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(0,0,0,0.1);
+    border-top-color: #27ae60;
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* Image Preview */
+  .preview-image {
+    max-width: 100%;
+    height: auto;
+    margin-top: 20px;
+    border: 3px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  #image-preview-container {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: none;
+  }
+  
+  /* Mobile Responsive */
+  @media (max-width: 600px) {
+    header h1 {
+      font-size: 2rem;
+    }
+  
+    input[type="file"], button {
+      width: 90%;
+    }
+  }
+  

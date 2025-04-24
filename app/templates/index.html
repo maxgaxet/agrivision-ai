@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AgriVision.AI - Plant Disease Detection</title>
+  
+  <!-- Favicon for the Title Bar -->
+  <link rel="icon" href="{{ url_for('static', filename='images/plant_logo.ico') }}" type="image/x-icon">
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+  
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #e8f5e9, #e0f7fa);
+      color: #333;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header img {
+      width: 100px; /* Adjust the size of the logo */
+      height: auto;
+      margin-bottom: 10px;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      color: #2ecc71;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+
+    header h1 .highlight {
+      color: #9b59b6;
+    }
+
+    header p {
+      font-size: 1.2rem;
+      color: #34495e;
+      margin-top: 0;
+    }
+
+    .upload-section, .result-section {
+      margin-top: 40px;
+    }
+
+    input[type="file"] {
+      padding: 12px;
+      border: 2px dashed #27ae60;
+      border-radius: 8px;
+      background-color: #f0fdfa;
+      margin-top: 20px;
+      font-size: 1rem;
+    }
+
+    button {
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      border-radius: 8px;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #2ecc71;
+    }
+
+    .result-image {
+      max-width: 80%;
+      height: auto;
+      margin-top: 20px;
+      border: 3px solid #ddd;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .spinner {
+      margin: 20px auto;
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(0,0,0,0.1);
+      border-top-color: #27ae60;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 2rem;
+      }
+
+      input[type="file"], button {
+        width: 90%;
+      }
+    }
+
+    /* Flexbox for centering the result section content */
+    .result-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    /* Center the "Try Another Image" button */
+    .result-section button {
+      margin-top: 20px;
+      padding: 12px 24px;
+      background-color: #27ae60;
+      color: white;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s ease;
+      display: inline-block;
+      text-align: center;
+    }
+
+    /* Disease Treatment Section */
+    .disease-treatment {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      text-align: left;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .disease-treatment h4 {
+      color: #2ecc71;
+    }
+
+    .disease-treatment ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .disease-treatment li {
+      margin-bottom: 15px; /* Adds space between treatments */
+    }
+
+    .disease-treatment p {
+      margin-left: 20px;
+      font-style: italic;
+      color: #555;
+    }
+
+    .copyright {
+      font-size: 0.9rem;
+      color: #7f8c8d;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>AgriVision.<span class="highlight">AI</span></h1>
+      <p>Empowering Farmers with AI-Powered Plant Health Insights</p>
+    </header>
+
+    <section class="upload-section" id="upload-section">
+      <h2>📸 Upload Plant Image</h2>
+      <form id="upload-form" method="POST" action="/predict" enctype="multipart/form-data">
+        <input type="file" name="file" id="file-input" accept="image/*" required>
+        <button type="submit" id="submit-btn">🔍 Predict</button>
+      </form>
+
+      <div id="loading" class="spinner" style="display: none;"></div>
+    </section>
+
+    <section id="result-container" class="result-section" style="display: none;">
+      <h3 id="result-label"></h3>
+      <h4>Confidence: <span id="result-confidence"></span>%</h4>
+      <img id="result-image" class="result-image" src="" alt="Uploaded Image">
+      
+      <!-- Disease Treatment Information -->
+      <div id="disease-treatment" class="disease-treatment" style="display: none;">
+        <h4>Suggested Treatments:</h4>
+        <p><strong>Cause:</strong> <span id="disease-cause"></span></p>
+        <ul id="treatment-list"></ul>
+      </div>
+
+      <button id="try-another-btn">🔄 Try Another Image</button>
+    </section>
+    
+    <div class="copyright">
+      <p>&copy; 2025 AgriVision.AI. All Rights Reserved.</p>
+      <p>Developed by Margaret Jannesthaya. All content, images, and data are protected by copyright laws.</p>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById('upload-form');
+      const fileInput = document.getElementById('file-input');
+      const submitBtn = document.getElementById('submit-btn');
+      const loadingSpinner = document.getElementById('loading');
+      const resultContainer = document.getElementById('result-container');
+      const resultLabel = document.getElementById('result-label');
+      const resultConfidence = document.getElementById('result-confidence');
+      const resultImage = document.getElementById('result-image');
+      const diseaseTreatmentSection = document.getElementById('disease-treatment');
+      const diseaseCause = document.getElementById('disease-cause');
+      const treatmentList = document.getElementById('treatment-list');
+      const tryAnotherBtn = document.getElementById('try-another-btn');
+      const uploadSection = document.getElementById('upload-section');
+      
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        submitBtn.disabled = true;
+        loadingSpinner.style.display = 'block';
+        resultContainer.style.display = 'none';
+        diseaseTreatmentSection.style.display = 'none';
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+          const res = await fetch('/predict', {
+            method: 'POST',
+            body: formData
+          });
+
+          const data = await res.json();
+          loadingSpinner.style.display = 'none';
+          submitBtn.disabled = false;
+
+          if (data.prediction) {
+            resultLabel.textContent = `🧠 Prediction: ${data.prediction}`;
+            resultConfidence.textContent = parseFloat(data.confidence).toFixed(2);
+            resultImage.src = data.img_path;
+            resultContainer.style.display = 'block';
+
+            // Display treatment information
+            diseaseCause.textContent = data.cause;
+            treatmentList.innerHTML = '';
+            data.treatments.forEach(treatment => {
+              const listItem = document.createElement('li');
+              const treatmentMethod = document.createElement('strong');
+              treatmentMethod.textContent = `${treatment.method}:`;
+              const treatmentDetails = document.createElement('p');
+              treatmentDetails.textContent = treatment.details;
+              listItem.appendChild(treatmentMethod);
+              listItem.appendChild(treatmentDetails);
+              treatmentList.appendChild(listItem);
+            });
+            diseaseTreatmentSection.style.display = 'block';
+          } else {
+            alert('Error: ' + (data.error || 'Unknown error'));
+          }
+        } catch (err) {
+          loadingSpinner.style.display = 'none';
+          submitBtn.disabled = false;
+          alert('An error occurred. Please try again.');
+        }
+      });
+
+      // Reset the form and result section
+      tryAnotherBtn.addEventListener('click', () => {
+        // Reset the file input and hide the result section
+        form.reset();
+        fileInput.value = ''; // Clear file input
+        resultContainer.style.display = 'none';
+        diseaseTreatmentSection.style.display = 'none';
+        
+        // Show the upload section again
+        uploadSection.style.display = 'block';
+        
+        // Reset button and spinner visibility
+        loadingSpinner.style.display = 'none';
+        submitBtn.disabled = false;
+      });
+    });
+  </script>
+</body>
+</html>
